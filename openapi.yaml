@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: 'OpenAPI-спецификация, собранная по MDX-документации ParkTrack API. Базовый путь API: /api/v1.'
 servers:
-- url: https://api.dev.parktrack.live/api/v1
+- url: https://api.parktrack.live/api/v1
   description: Production
 security:
 - bearerAuth: []
@@ -29,6 +29,8 @@ tags:
   description: Единый реестр источников данных.
 - name: Admin
   description: Административный мониторинг и действия.
+- name: Weather
+  description: Погодные условия камер в разное время.
 - name: System
   description: Служебные эндпоинты.
 paths:
@@ -1810,18 +1812,18 @@ paths:
   /admin/partners:
     get:
       tags:
-      - Admin
+        - Admin
       summary: Административный список партнёров
       operationId: listAdminPartners
       parameters:
-      - $ref: '#/components/parameters/Q'
-      - name: is_active
-        in: query
-        required: false
-        schema:
-          type: boolean
-      - *id001
-      - *id002
+        - $ref: '#/components/parameters/Q'
+        - name: is_active
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - *id001
+        - *id002
       responses:
         '200':
           description: OK
@@ -1831,6 +1833,108 @@ paths:
                 $ref: '#/components/schemas/PartnerListResponse'
         '401': *id003
         '403': *id004
+  /weather:
+    get:
+      tags:
+        - Weather
+      summary: Список наблюдений погоды
+      operationId: listWeather
+      parameters:
+        - name: camera_id
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: latest_only
+          in: query
+          required: false
+          schema:
+            type: boolean
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /weather/new:
+    get:
+      tags:
+        - Weather
+      summary: Новое наблюдение погоды
+      operationId: postWeather
+      parameters:
+        - name: camera_id
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: observed_at
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: temperature
+          in: query
+          required: false
+          schema:
+            type: float
+        - name: precipitation
+          in: query
+          required: false
+          schema:
+            type: float
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '415':
+          $ref: '#/components/responses/UnsupportedMediaType'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
   /health:
     get:
       tags:
@@ -1993,6 +2097,12 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
     UnsupportedMediaType:
       description: Unsupported Media Type
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    UnprocessableEntity:
+      description: Unprocessable Entity
       content:
         application/json:
           schema:
@@ -2685,6 +2795,35 @@ components:
       - total
       - top
       - offset
+      additionalProperties: false
+    WeatherListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeatherObservation'
+      required:
+        - items
+      additionalProperties: false
+    WeatherObservation:
+      type: object
+      properties:
+        camera_id:
+          type: integer
+        observed_at:
+          type: string
+          format: date-time
+          nullable: true
+        temperature:
+          type: float
+        precipitation:
+          type: float
+      required:
+        - camera_id
+        - observed_at
+        - temperature
+        - precipitation
       additionalProperties: false
     Camera:
       type: object
