@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: 'OpenAPI-спецификация, собранная по MDX-документации ParkTrack API. Базовый путь API: /api/v1.'
 servers:
-- url: https://api.parktrack.live/api/v1
+- url: https://api.dev.parktrack.live/api/v1
   description: Production
 security:
 - bearerAuth: []
@@ -1870,18 +1870,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WeatherListResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
   /weather/new:
@@ -1953,18 +1945,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WeatherObservation'
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '415':
-          $ref: '#/components/responses/UnsupportedMediaType'
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
 
